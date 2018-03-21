@@ -5,6 +5,9 @@ module.exports = client((method, endpoint, data, auth, callback) => {
     var req = new XMLHttpRequest();
     req.open(method, `/api${endpoint}`, true);
     req.setRequestHeader("Content-Type", "application/json");
+    if(auth) {
+        req.setRequestHeader("X-Auth-Token", auth);
+    }
     req.onreadystatechange = function() {
         if(req.readyState != 4) {
             return;

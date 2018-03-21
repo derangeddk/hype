@@ -45,11 +45,16 @@ function findElementsNotFound(expecteds, actuals) {
 }
 
 Given(/^a campaign "([^"]+)" exists$/, function(campaignName, callback) {
-    this.client.auth("admin", "admin", (error) => {
+    this.adminClient.campaign.create(campaignName, callback);
+});
+
+When(/^I list all campaigns$/, function(callback) {
+    this.client.campaign.list((error, data) => {
         if(error) {
             return callback(error);
         }
-        this.client.campaign.create(campaignName, callback);
+        this.receivedList = data.campaigns;
+        callback();
     });
 });
 
@@ -68,7 +73,7 @@ When(/^I sign up for the "([^"]+)" campaign with the following information:$/, f
 });
 
 Then(/^the following campaigns? exists?:$/, function(table, callback) {
-    this.client.campaign.list((error, data) => {
+    this.adminClient.campaign.list((error, data) => {
         if(error) {
             return callback(error);
         }
@@ -94,7 +99,7 @@ Then(/^the subscribers to the "([^"]+)" campaign are:$/, function(campaignName, 
         if(error) {
             return callback(error);
         }
-        this.client.campaign.listSubscribers(campaign.id, (error, data) => {
+        this.adminClient.campaign.listSubscribers(campaign.id, (error, data) => {
             if(error) {
                 return callback(error);
             }
@@ -124,24 +129,28 @@ Given(/^the following users have signed up for the "([^"]+)" campaign:$/, functi
         }
 
         let usersToSignUp = table.hashes();
-        async.each(usersToSignUp, (user, callback) => {
-            this.client.campaign.subscribe(campaign.id, user.name, user.email, callback);
+        async.eachSeries(usersToSignUp, (user, callback) => {
+            this.adminClient.campaign.subscribe(campaign.id, user.name, user.email, callback);
         }, callback);
     });
 });
 
-When(/^I confirm the subscription for (.+) to the "([^"]+)" campaign$/, confirmEmailInCampaign);
+When(/^I confirm the subscription for (.+) to the "([^"]+)" campaign$/, function(emailToConfirm, campaignName, callback) {
+    confirmEmailInCampaign.call(this, this.client, emailToConfirm, campaignName, callback);
+});
 
-function confirmEmailInCampaign(emailToConfirm, campaignName, callback) {
+function confirmEmailInCampaign(client, emailToConfirm, campaignName, callback) {
     this.findCampaignAndSubscriber(campaignName, emailToConfirm, (error, campaign, subscriber) => {
         if(error) {
             return callback(error);
         }
-        this.client.campaign.confirmSubscription(campaign.id, subscriber.id, callback);
+        client.campaign.confirmSubscription(campaign.id, subscriber.id, callback);
     });
 }
 
-Given(/^the subscription for (.+) to the "([^"]+)" campaign is confirmed$/, confirmEmailInCampaign);
+Given(/^the subscription for (.+) to the "([^"]+)" campaign is confirmed$/, function(emailToConfirm, campaignName, callback) {
+    confirmEmailInCampaign.call(this, this.adminClient, emailToConfirm, campaignName, callback);
+});
 
 When(/^I list the confirmed subscribers to the "([^"]+)" campaign$/, function(campaignName, callback) {
     this.findCampaignByName(campaignName, (error, campaign) => {
@@ -218,3 +227,45 @@ When(/^I unsubscribe (.+) from the "([^"]+)" campaign$/, function(emailToUnsubsc
         this.client.campaign.unsubscribe(campaign.id, subscriber.id, callback);
     });
 });
+
+When(/^I attempt to create a campaign "([^"]+)"$/, function(campaignName, callback) {
+    this.client.campaign.create(campaignName, (error, data) => {
+        this.attemptResult = { error, data };
+        callback();
+    });
+});
+
+Then(/^I am told that I must be authenticated to perform that action$/, function(callback) {
+    let { error } = this.attemptResult;
+    if(!error) {
+        return callback(new Error("Attempt succeeded unexpectedly."));
+    }
+    if(!error.statusCode || error.statusCode != 401) {
+        return callback({
+            trace: new Error("Attempt failed, but with an unexpected error"),
+            result: this.attemptResult
+        });
+    }
+    callback();
+});
+
+When(/^I attempt to list all campaigns$/, function(callback) {
+    this.client.campaign.list((error, data) => {
+        this.attemptResult = { error, data };
+        callback();
+    });
+});
+
+When(/^I attempt to list the subscribers to the "([^"]+)" campaign$/, function(campaignName, callback) {
+    this.findCampaignByName(campaignName, (error, campaign) => {
+        if(error) {
+            return callback(error);
+        }
+        this.client.campaign.listSubscribers(campaign.id, (error, data) => {
+            this.attemptResult = { error, data };
+            callback();
+        });
+    });
+});
+
+

@@ -10,7 +10,21 @@ module.exports = (request) => {
     }
 
     return {
-        auth: (username, password, callback) => callback(), //TODO
+        auth: (username, password, callback) => {
+            request("POST", "/authenticate", { username, password }, null, (error, data) => {
+                if(error) {
+                    return callback(error);
+                }
+                auth = data.authentication;
+                callback();
+            });
+        },
+        users: {
+            create: (username, name, email, password, callback) => r("POST", "/user", { username, name, email, password }, callback),
+            list: (callback) => r("GET", "/user", callback),
+            update: (username, dataToUpdate, callback) => r("PUT", `/user/${username}`, dataToUpdate, callback),
+            delete: (username, callback) => r("DELETE", `/user/${username}`, callback)
+        },
         campaign: {
             create: (name, callback) => r("POST", "/campaign", { name }, callback),
             subscribe: (campaignId, name, email, callback) => r("POST", `/campaign/${campaignId}/subscriber`, { name, email }, callback),

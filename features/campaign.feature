@@ -10,6 +10,16 @@ Feature: Campaign
         | name                | subscribers |
         | Curling Enthusiasts | 0           |
 
+    Scenario: List campaigns
+        Given I authenticate as the user "admin" with password "admin"
+        And a campaign "Curling Enthusiasts" exists
+        And a campaign "High-Roping Huskies" exists
+        When I list all campaigns
+        Then I receive the following list:
+        | name                 |
+        | Curling Enthusiasts  |
+        | High-Roping Huskies  |
+
     Scenario: Sign up for campaign
         Given a campaign "Curling Enthusiasts" exists
         When I sign up for the "Curling Enthusiasts" campaign with the following information:
@@ -35,7 +45,8 @@ Feature: Campaign
         | Asbjørn | asbjoern@deranged.dk | pending   |
 
     Scenario: List all subscribers
-        Given a campaign "Curling Enthusiasts" exists
+        Given I authenticate as the user "admin" with password "admin"
+        And a campaign "Curling Enthusiasts" exists
         And the following users have signed up for the "Curling Enthusiasts" campaign:
         | name    | email                |
         | Niels   | niels@deranged.dk    |
@@ -51,7 +62,8 @@ Feature: Campaign
         | Anders  | anders@deranged.dk   |
 
     Scenario: List confirmed subscribers
-        Given a campaign "Curling Enthusiasts" exists
+        Given I authenticate as the user "admin" with password "admin"
+        And a campaign "Curling Enthusiasts" exists
         And the following users have signed up for the "Curling Enthusiasts" campaign:
         | name    | email                |
         | Niels   | niels@deranged.dk    |
@@ -76,3 +88,25 @@ Feature: Campaign
         | name    | email                | status       |
         | Niels   | niels@deranged.dk    | unsubscribed |
         | Asbjørn | asbjoern@deranged.dk | pending      |
+
+    Scenario: Cannot create campaign without authenticating
+        When I attempt to create a campaign "Curling Enthusiasts"
+        Then I am told that I must be authenticated to perform that action
+
+    Scenario: Cannot list campaigns without authenticating
+        Given a campaign "Curling Enthusiasts" exists
+        And a campaign "High-Roping Huskies" exists
+        When I attempt to list all campaigns
+        Then I am told that I must be authenticated to perform that action
+
+    Scenario: Cannot list subscribers without authenticating
+        Given a campaign "Curling Enthusiasts" exists
+        And the following users have signed up for the "Curling Enthusiasts" campaign:
+        | name    | email                |
+        | Niels   | niels@deranged.dk    |
+        | Asbjørn | asbjoern@deranged.dk |
+        | Anders  | anders@deranged.dk   |
+        And the subscription for niels@deranged.dk to the "Curling Enthusiasts" campaign is confirmed
+        And the subscription for anders@deranged.dk to the "Curling Enthusiasts" campaign is confirmed
+        When I attempt to list the subscribers to the "Curling Enthusiasts" campaign
+        Then I am told that I must be authenticated to perform that action

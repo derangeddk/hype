@@ -8,40 +8,7 @@ const config = require("config");
 const port = 4000;
 
 setWorldConstructor(function() {
-    let serverUri = `http://localhost:${port}`;
-
-    this.client = client((method, endpoint, data, auth, callback) => {
-        //TODO: auth
-        let requestOpts = {
-            method,
-            url: `${serverUri}/api${endpoint}`,
-            json: true
-        };
-
-        if(data) {
-            requestOpts.json = data;
-        }
-
-        request(requestOpts, (error, httpResponse, body) => {
-            if(error) {
-                return callback({
-                    trace: error,
-                    message: "Error in request",
-                    body
-                });
-            }
-            if(httpResponse.statusCode >= 400) {
-                return callback({
-                    trace: new Error("Status code invalid"),
-                    message: `Status code ${httpResponse.statusCode}`,
-                    body
-                });
-            }
-            callback(null, body);
-        });
-    });
-
-    this.findCampaignByName = (campaignName, callback) => this.client.campaign.list((error, data) => {
+    this.findCampaignByName = (campaignName, callback) => this.adminClient.campaign.list((error, data) => {
         if(error) {
             return callback(error);
         }
@@ -60,11 +27,19 @@ setWorldConstructor(function() {
             if(error) {
                 return callback(error);
             }
-            this.client.campaign.listSubscribers(campaign.id, (error, result) => {
+            this.adminClient.campaign.listSubscribers(campaign.id, (error, result) => {
                 if(error) {
                     return callback(error);
                 }
                 let subscriber = result.subscribers.find((subscriber) => subscriber.email == email);
+                if(!subscriber) {
+                    return callback({
+                        trace: new Error("No such subscriber"),
+                        email,
+                        campaign,
+                        subscribers: result.subscribers
+                    });
+                }
 
                 callback(null, campaign, subscriber);
             });
@@ -72,7 +47,53 @@ setWorldConstructor(function() {
     };
 });
 
+function makeClient(serverUri, name) {
+    return client((method, endpoint, data, auth, callback) => {
+        let requestOpts = {
+            method,
+            url: `${serverUri}/api${endpoint}`,
+            json: true
+        };
+
+        if(auth) {
+            requestOpts.headers = { 'X-Auth-Token': auth };
+        }
+
+        if(data) {
+            requestOpts.json = data;
+        }
+
+        //console.log(`[${name}]${auth ? "@" : "x"}:`, endpoint);
+        // TODO: turn into debug statement
+
+        request(requestOpts, (error, httpResponse, body) => {
+            if(error) {
+                return callback({
+                    trace: error,
+                    message: "Error in request",
+                    body
+                });
+            }
+            if(httpResponse.statusCode >= 400) {
+                return callback({
+                    trace: new Error("Status code invalid"),
+                    message: `Status code ${httpResponse.statusCode}`,
+                    statusCode: httpResponse.statusCode,
+                    body
+                });
+            }
+            callback(null, body);
+        });
+    });
+}
+
 Before(function(testCase, callback) {
+    //set up clients (they need to be set up in Before so their state is cleared each scenario)
+    let serverUri = `http://localhost:${port}`;
+    //console.log("--client reset--"); //TODO: make debug statement
+    this.client = makeClient(serverUri, "client");
+    this.adminClient = makeClient(serverUri, "admin");
+
     //set up db
     let db = new PostgresPool(config.postgres);
 
@@ -86,7 +107,10 @@ Before(function(testCase, callback) {
         let app = hype(db);
         this.server = app.listen(port);
 
-        callback();
+        //TODO: fix this timeout
+        //      it exists to wait for databases to be ensured.
+        //      a better model would have a listener on the app for "setup complete" or similar
+        setTimeout(() => this.adminClient.auth("admin", "admin", callback), 1000);
     });
 });
 

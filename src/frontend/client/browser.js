@@ -1,7 +1,6 @@
 const client = require("./index");
 
 module.exports = client((method, endpoint, data, auth, callback) => {
-    //TODO: auth
     var req = new XMLHttpRequest();
     req.open(method, `/api${endpoint}`, true);
     req.setRequestHeader("Content-Type", "application/json");
@@ -22,5 +21,8 @@ module.exports = client((method, endpoint, data, auth, callback) => {
             response: req.response
         });
     };
-    req.send(JSON.stringify(data));
+    if(data) {
+        return req.send(JSON.stringify(data));
+    }
+    req.send();
 });

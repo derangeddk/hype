@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<form id="login-form">
+    <label for="username">
+        username
+        <input type="text" name="username">
+    </label>
+    <label for="password">
+        password
+        <input type="password" name="password">
+    </label>
+    <button type="submit">login</button>
+</form>
+<script>
+(function() {
+    let form = document.querySelector("#login-form");
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        hype.auth(form.username.value, form.password.value, (error) => {
+            if(error) {
+                console.error("Login failed", error);
+                form.username.value = "";
+                form.password.value = "";
+                return;
+            }
+            localStorage.setItem("hype-authentication", hype.getAuthToken());
+            location.pathname = "/campaigns";
+        });
+    });
+})();
+</script>

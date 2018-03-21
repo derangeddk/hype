@@ -1,0 +1,91 @@
+---
+layout: default
+---
+<div id="users-page" class="page">
+    <h1>Users</h1>
+    <form class="add-user-form add-item-form">
+        <label for="username">
+            Username:
+            <input type="text" name="username">
+        </label>
+        <label for="name">
+            Name:
+            <input type="text" name="name">
+        </label>
+        <label for="email">
+            Email:
+            <input type="text" name="email">
+        </label>
+        <label for="password">
+            Password:
+            <input type="password" name="password">
+        </label>
+        <button type="submit">Add user</button>
+    </form>
+    <table class="item-list users-list">
+        <thead>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<script>
+(function() {
+    let form = document.querySelector(".add-user-form");
+    let usersListTbody = document.querySelector(".users-list tbody");
+
+    let userToRow = ({ username, name, email }) => `
+        <td>${username}</td>
+        <td>${name}</td>
+        <td>${email}</td>
+        <td>
+            <a data-delete-user data-username="${username}">Delete</a>
+        </td>
+    `;
+
+    hype.users.list((error, result) => {
+        if(error) {
+            return console.error("Failed to load users", error);
+        }
+        usersListTbody.innerHTML = result.users.map((user) => `
+            <tr data-username="${user.username}">${userToRow(user)}</tr>
+        `).join("");
+
+        //enable actions
+        Array.prototype.map.call(usersListTbody.querySelectorAll("[data-delete-user]"), (deleteLink) => {
+            setUpDeleteLink(deleteLink);
+        });
+    });
+
+    function setUpDeleteLink(deleteLink) {
+        deleteLink.addEventListener("click", function(e) {
+            hype.users.delete(this.dataset.username, (error) => {
+                if(error) {
+                    return console.error("Failed to delete user", error);
+                }
+                usersListTbody.querySelector(`tr[data-username='${this.dataset.username}']`).remove();
+            });
+        });
+    }
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        hype.users.create(form.username.value, form.name.value, form.email.value, form.password.value, (error, result) => {
+            if(error) {
+                return console.error("Failed to create user", error);
+            }
+            let row = document.createElement("tr");
+            row.dataset.username = result.user.username;
+            row.innerHTML = userToRow(result.user);
+            usersListTbody.appendChild(row);
+
+            //enable actions
+            setUpDeleteLink(row.querySelector("[data-delete-user]"));
+        });
+    });
+})();
+</script>

@@ -21,6 +21,6 @@ module.exports = (db) => (req, res) => {
             console.error("Failed to create new user", username, name, email, error);
             return res.status(500).send({ error: "Failed to create new user" });
         }
-        res.send(user);
+        res.send({ user });
     });
 };

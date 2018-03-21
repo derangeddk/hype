@@ -19,6 +19,8 @@ module.exports = (request) => {
                 callback();
             });
         },
+        setAuthToken: (authentication) => { auth = authentication; },
+        getAuthToken: () => auth,
         users: {
             create: (username, name, email, password, callback) => r("POST", "/user", { username, name, email, password }, callback),
             list: (callback) => r("GET", "/user", callback),

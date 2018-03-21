@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf8">
         <title>HYPE</title>
-        <script src="/assets/vue.js"></script>
         <script src="/assets/hype.js"></script>
         <style type="text/css">
             body {
@@ -145,9 +144,11 @@
             }
             @keyframes spin {
                 0% { transform: rotate(0deg); }
-                33% { transform: rotate(120deg); }
-                66% { transform: rotate(240deg); }
-                100% { transform: rotate(360deg); }
+                20% { transform: rotate(144deg); }
+                40% { transform: rotate(288deg); }
+                60% { transform: rotate(432deg); }
+                80% { transform: rotate(576deg); }
+                100% { transform: rotate(720deg); }
             }
             .spinner {
                 width: 25px;
@@ -162,7 +163,7 @@
             .new-campaign .spinner {
                 margin: 0;
             }
-            #campaign-view {
+            .page {
                 margin: 30px 0;
                 width: 100%;
                 max-width: 600px;
@@ -170,45 +171,62 @@
                 padding: 15px;
                 display: inline-block;
             }
-            #campaign-view > h1 {
+            .page > h1 {
                 font-weight: normal;
                 font-size: 1.6em;
                 margin: 0;
             }
-            #campaign-view > span {
+            .page > span {
                 color: #444;
                 font-size: 0.9em;
                 display: block;
             }
-            .add-subscriber-form {
+            .add-item-form {
                 margin: 10px 0;
                 border: 1px solid #999;
                 padding: 5px;
                 display: block;
             }
-            .add-subscriber-form label {
+            .add-item-form label {
                 display: block;
             }
-            .subscriber-list {
+            .item-list {
                 width: 100%;
                 border-collapse: collapse;
                 border: 1px solid #4E6378;
             }
-            .subscriber-list th {
+            .item-list th {
                 color: white;
                 background: #4E6378;
             }
-            .subscriber-list th, .subscriber-list td {
+            .item-list th, .item-list td {
                 padding: 8px;
                 font-size: 0.9em;
                 border-bottom: 1px solid #4E6378;
             }
-            .subscriber-list a {
+            .item-list a {
                 text-decoration: underline;
                 cursor: pointer;
                 color: #2ecc71;
             }
+            form#login-form {
+                display: inline-block;
+                width: 100%;
+                max-width: 500px;
+                background: white;
+                padding: 15px;
+            }
+            form#login-form label {
+                display: block;
+            }
         </style>
+        <script>
+            let authentication = localStorage.getItem("hype-authentication");
+            if(!authentication && location.pathname != "/login") {
+                location.pathname = "/login";
+            }
+            hype.setAuthToken(authentication);
+        </script>
     </head>
     <body>
         <header>

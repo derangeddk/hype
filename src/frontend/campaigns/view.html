@@ -1,7 +1,7 @@
 ---
 layout: default
 ---
-<div id="campaign-view">
+<div id="campaign-view" class="page">
     <div class="spinner"></div>
 </div>
 <script>
@@ -39,7 +39,7 @@ layout: default
                 ${campaign.subscribers.filter((s) => s.status == "pending").length} pending |
                 ${campaign.subscribers.filter((s) => s.status == "unsubscribed").length} unsubscribed
             </span>
-            <form class="add-subscriber-form">
+            <form class="add-subscriber-form add-item-form">
                 <label for="name">
                     Name:
                     <input type="text" name="name">
@@ -50,7 +50,7 @@ layout: default
                 </label>
                 <button type="submit">Add subscriber</button>
             </form>
-            <table class="subscriber-list">
+            <table class="item-list subscriber-list">
                 <thead>
                     <th>Name</th>
                     <th>Email</th>

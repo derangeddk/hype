@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf8">
+        <title>HYPE</title>
+        <script src="/assets/vue.js"></script>
+        <script src="/assets/hype.js"></script>
+        <style type="text/css">
+            body {
+                margin: 0;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                background: #f7f7f7;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            header {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                flex-shrink: 0;
+            }
+            header:before {
+                content: ' ';
+                background: #2ecc71;
+                width: 100%;
+                height: 200px;
+                transform: skewY(-8deg);
+                position: absolute;
+                top: -140px;
+                z-index: -1;
+            }
+            header .logo {
+                font-weight: 900;
+                font-size: 3em;
+                text-decoration: none;
+                text-align: center;
+                background: #34495e;
+                display: inline-block;
+                color: white;
+                padding: 20px;
+                height: 175px;
+                box-sizing: border-box;
+                letter-spacing: 0.7em;
+                padding-left: calc(20px + 0.42em);
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+            header nav {
+                background: #4E6378;
+                flex-grow: 1;
+                padding-left: 15px;
+                margin-bottom: 60px;
+            }
+            header nav a {
+                color: white;
+                text-decoration: none;
+                display: inline-block;
+                padding: 11px;
+                border: 4px solid transparent;
+                transition: background 0.4s, border 0.4s;
+            }
+            header nav a:hover {
+                background: rgba(255,255,255,0.1);
+                border-bottom-color: #3498db;
+            }
+            main {
+                flex-grow: 1;
+                flex-shrink: 0;
+            }
+            footer {
+                background: #1B3045;
+                color: white;
+                padding: 20px;
+                flex-shrink: 0;
+            }
+            footer a {
+                color: #ccc;
+            }
+            main {
+                text-align: center;
+            }
+            main > * {
+                text-align: left;
+            }
+            #campaign-container {
+                display: inline-block;
+                width: 100%;
+                max-width: 1000px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin: 50px auto;
+            }
+            .campaign {
+                box-sizing: border-box;
+                display: inline-block;
+                width: 320px;
+                margin: 5px;
+                padding: 12px;
+                color: inherit;
+                min-height: 100px;
+                text-decoration: none;
+                background: white;
+                box-shadow: 0 0 4px rgba(0,0,0,0.05) inset, 0 0 4px rgba(0,0,0,0.15), 0 2px 2px rgba(0,0,0,0.2);
+                transform: translateY(0);
+                transition: 0.4s box-shadow, 0.4s transform;
+                cursor: pointer;
+            }
+            .campaign:before {
+                content: 'CAMPAIGN';
+                font-size: 0.7em;
+                font-weight: bold;
+                margin-top: -3px;
+                color: #666;
+                display: block;
+            }
+            .campaign:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 0 4px rgba(0,0,0,0.05) inset, 0 0 4px rgba(0,0,0,0.15), 0 6px 6px rgba(0,0,0,0.2);
+            }
+            .campaign h1 {
+                margin: 0;
+                font-size: 1.2em;
+            }
+            .campaign span {
+                font-size: 0.9em;
+                color: #444;
+            }
+            .campaign.new-campaign {
+                text-align: center;
+                padding: 35px 10px;
+                font-size: 1.4em;
+                background: transparent;
+                box-shadow: 0 0 0 transparent;
+                border: 1px dashed rgba(0,0,0,0.2);
+            }
+            .campaign.new-campaign:hover {
+                box-shadow: 0 4px 4px rgba(0,0,0,0.1);
+            }
+            .campaign.new-campaign:before {
+                display: none;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                33% { transform: rotate(120deg); }
+                66% { transform: rotate(240deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .spinner {
+                width: 25px;
+                height: 25px;
+                border-radius: 100%;
+                border: 4px solid #4E6378;
+                border-left-color: #2ecc71;
+                animation: 2s spin infinite;
+                margin: 30px;
+                display: inline-block;
+            }
+            .new-campaign .spinner {
+                margin: 0;
+            }
+            #campaign-view {
+                margin: 30px 0;
+                width: 100%;
+                max-width: 600px;
+                background: white;
+                padding: 15px;
+                display: inline-block;
+            }
+            #campaign-view > h1 {
+                font-weight: normal;
+                font-size: 1.6em;
+                margin: 0;
+            }
+            #campaign-view > span {
+                color: #444;
+                font-size: 0.9em;
+                display: block;
+            }
+            .add-subscriber-form {
+                margin: 10px 0;
+                border: 1px solid #999;
+                padding: 5px;
+                display: block;
+            }
+            .add-subscriber-form label {
+                display: block;
+            }
+            .subscriber-list {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid #4E6378;
+            }
+            .subscriber-list th {
+                color: white;
+                background: #4E6378;
+            }
+            .subscriber-list th, .subscriber-list td {
+                padding: 8px;
+                font-size: 0.9em;
+                border-bottom: 1px solid #4E6378;
+            }
+            .subscriber-list a {
+                text-decoration: underline;
+                cursor: pointer;
+                color: #2ecc71;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <a href="/" class="logo">HY<br>PE</a>
+            <nav>
+                <a href="/">Dashboard</a>
+                <a href="/campaigns">Campaigns</a>
+                <a href="/templates">Templates</a>
+                <a href="/users">Users</a>
+            </nav>
+        </header>
+        <main>
+            {{ &content }}
+        </main>
+        <footer>
+            <p>HYPE is a free, open source project by <a href="http://deranged.dk" target="_blank" rel="noopener">deranged</a>, with an open license.</p>
+            <p>You can support our open source work by hiring us as consultants, or by <a href="https://github.com/derangeddk/hype" target="_blank" rel="noopener">contributing</a>.</p>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,123 @@
+---
+layout: default
+---
+<div id="campaign-view">
+    <div class="spinner"></div>
+</div>
+<script>
+(function() {
+    //TODO: hype.campaign.view( id ) could return the campaign object we actually want...
+    //      from /campaign/:id (doesn't exist rn) 2018-03-21
+    hype.campaign.list((error, data) => {
+        if(error) {
+            return console.error("Failed to load campaign list", error);
+        }
+        let campaign = data.campaigns.find((campaign) => campaign.id == "{{ campaignId }}");
+        if(!campaign) {
+            //TODO: 404 page
+            return console.error("The requested campaign does not exist", error);
+        }
+        hype.campaign.listSubscribers("{{ campaignId }}", (error, data) => {
+            if(error) {
+                return console.error("Failed to get subscriber list for campaign", error);
+            }
+            campaign.subscribers = data.subscribers;
+            renderCampaign(campaign);
+        });
+    });
+
+    let campaignView = document.querySelector("#campaign-view");
+
+    function renderCampaign(campaign) {
+        let incif = (stmt, content) => stmt ? content : "";
+
+        //render
+        campaignView.innerHTML = `
+            <h1>${campaign.name}</h1>
+            <span>
+                <strong>${campaign.subscribers.filter((s) => s.status == "confirmed").length} confirmed subscribers</strong> |
+                ${campaign.subscribers.filter((s) => s.status == "pending").length} pending |
+                ${campaign.subscribers.filter((s) => s.status == "unsubscribed").length} unsubscribed
+            </span>
+            <form class="add-subscriber-form">
+                <label for="name">
+                    Name:
+                    <input type="text" name="name">
+                </label>
+                <label for="email">
+                    Email:
+                    <input type="text" name="email">
+                </label>
+                <button type="submit">Add subscriber</button>
+            </form>
+            <table class="subscriber-list">
+                <thead>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th><!-- Actions --></th>
+                </thead>
+                <tbody>
+                ${campaign.subscribers.map((subscriber) => `<tr data-subscriber-id="${subscriber.id}">${makeSubscriberRow(subscriber)}</tr>`).join("")}
+                </tbody>
+            </table>
+        `;
+
+        function makeSubscriberRow(subscriber) {
+            return `
+                    <td class="name-field">${subscriber.name}</td>
+                    <td class="email-field">${subscriber.email}</td>
+                    <td class="status-field">${subscriber.status}</td>
+                    <td class="actions-field">
+                        ${incif(
+                            subscriber.status != "unsubscribed",
+                            `<a data-unsubscribe-action data-subscriber="${subscriber.id}">Unsubscribe</a>`
+                        )}
+                    </td>
+            `;
+        }
+
+        let subscriberListTbody = campaignView.querySelector(".subscriber-list tbody");
+
+        //enable subscription form
+        let addSubsciberForm = campaignView.querySelector("form.add-subscriber-form");
+        addSubsciberForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            hype.campaign.subscribe(campaign.id, addSubsciberForm.name.value, addSubsciberForm.email.value, (error, data) => {
+                if(error) {
+                    console.error("Failed to subscribe", error);
+                }
+                else {
+                    let subscriberRow = document.createElement("tr");
+                    subscriberRow.dataset.subscriberId = data.subscriber.id;
+                    subscriberRow.innerHTML = makeSubscriberRow(data.subscriber);
+                    subscriberListTbody.appendChild(subscriberRow);
+                    //enable actions
+                    enableUnsubscribe(subscriberRow.querySelector("[data-unsubscribe-action]"));
+                }
+                addSubsciberForm.name.value = "";
+                addSubsciberForm.email.value = "";
+            });
+        });
+
+        //enable actions
+        Array.prototype.map.call(subscriberListTbody.querySelectorAll("[data-unsubscribe-action]"), enableUnsubscribe);
+
+        function enableUnsubscribe(element) {
+            element.addEventListener("click", (e) => {
+                e.preventDefault();
+                let subscriberId = element.dataset.subscriber;
+                hype.campaign.unsubscribe(campaign.id, subscriberId, (error) => {
+                    if(error) {
+                        return console.error("Failed to unsubscribe", error);
+                    }
+                    // set as unsubscribed
+                    let statusField = subscriberListTbody.querySelector(`[data-subscriber-id='${subscriberId}'] .status-field`);
+                    statusField.innerText = "unsubscribed";
+                    element.remove();
+                });
+            });
+        }
+    }
+})();
+</script>

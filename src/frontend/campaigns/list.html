@@ -1,0 +1,75 @@
+---
+layout: default
+---
+<div id="campaign-container">
+    <div class="spinner"></div>
+</div>
+<script>
+(function() {
+    hype.campaign.list((error, data) => {
+        if(error) {
+            return console.error("Failed to load campaign list", error);
+        }
+        renderCampaigns(data.campaigns);
+    });
+
+    let campaignContainer = document.querySelector("#campaign-container");
+
+    function renderCampaigns(campaigns) {
+        campaignContainer.innerHTML = campaigns.map((campaign) => `
+            <a class="campaign" href="/campaigns/${campaign.id}">
+                <h1>${campaign.name}</h1>
+                <span>${campaign.subscribers} subscribers</span>
+            </a>
+        `).join("") + `
+            <a class="campaign new-campaign">
+                Add new campaign
+            </a>
+        `;
+
+        let newCampaignField = campaignContainer.querySelector(".new-campaign");
+        newCampaignField.addEventListener("click", function startCreate(e) {
+            e.preventDefault();
+            newCampaignField.removeEventListener("click", startCreate);
+
+            this.innerHTML = `
+                <form class="create-campaign-form">
+                    <label for="name">
+                        Campaign name
+                        <input type="text" name="name">
+                    </label>
+                    <button type="submit">Create</button>
+                    <button class="cancel-button">Cancel</button>
+                </form>
+            `;
+            this.querySelector(".cancel-button").addEventListener("click", (e) => {
+                this.innerHTML = `Add new campaign`;
+                this.addEventListener("click", startCreate);
+            });
+            let form = this.querySelector("form");
+            form.addEventListener("submit", (e) => {
+                this.innerHTML = `<div class="spinner"></div>`;
+                let name = form.name.value;
+                hype.campaign.create(name, (error, data) => {
+                    if(error) {
+                        console.error("failed to create new campaign", error);
+                    }
+                    else {
+                        let { campaign } = data;
+                        let newCampaign = document.createElement("a");
+                        newCampaign.classList.add("campaign");
+                        newCampaign.setAttribute("href", `/campaigns/${campaign.id}`);
+                        newCampaign.innerHTML = `
+                            <h1>${campaign.name}</h1>
+                            <span>${campaign.subscribers} subscribers</span>
+                        `;
+                        campaignContainer.insertBefore(newCampaign, newCampaignField);
+                    }
+                    newCampaignField.innerHTML = `Add new campaign`;
+                    newCampaignField.addEventListener("click", startCreate);
+                });
+            });
+        });
+    }
+})();
+</script>

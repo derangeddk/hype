@@ -1,0 +1,33 @@
+{
+  "name": "hype",
+  "version": "0.0.1",
+  "description": "email campaign management as a little web app you can easily run yourself",
+  "main": "src/app.js",
+  "bin": {
+    "hype": "./start.js"
+  },
+  "scripts": {
+    "test": "npm run test-unit && npm run test-integration",
+    "test-integration": "cucumber-js",
+    "test-unit": "jasmine"
+  },
+  "author": "Niels Abildgaard <niels@deranged.dk>",
+  "license": "ISC",
+  "devDependencies": {
+    "async": "^2.6.0",
+    "cucumber": "^4.0.0",
+    "jasmine": "^3.1.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "config": "^1.30.0",
+    "express": "^4.16.3",
+    "front-matter": "^2.3.0",
+    "mustache": "^2.3.0",
+    "pg": "^7.4.1",
+    "pg-pool": "^2.0.3",
+    "request": "^2.85.0",
+    "uuid": "^3.2.1",
+    "webpack": "^4.1.1"
+  }
+}

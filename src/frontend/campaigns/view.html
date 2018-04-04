@@ -6,9 +6,12 @@ layout: default
 </div>
 <script>
 (function() {
-    //TODO: hype.campaign.view( id ) could return the campaign object we actually want...
+    //TODO: hype.campaign.get( id ) could return the campaign object we actually want...
     //      from /campaign/:id (doesn't exist rn) 2018-03-21
     hype.campaign.list((error, data) => {
+        if(error && error.type == "Unauthorized") {
+            return location.href = "/login?redirect=" + location.pathname;
+        }
         if(error) {
             return console.error("Failed to load campaign list", error);
         }
@@ -18,6 +21,9 @@ layout: default
             return console.error("The requested campaign does not exist", error);
         }
         hype.campaign.listSubscribers("{{ campaignId }}", (error, data) => {
+            if(error && error.type == "Unauthorized") {
+                return location.href = "/login?redirect=" + location.path;
+            }
             if(error) {
                 return console.error("Failed to get subscriber list for campaign", error);
             }

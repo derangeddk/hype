@@ -14,6 +14,15 @@ module.exports = client((method, endpoint, data, auth, callback) => {
         if(req.status == 200) {
             return callback(null, JSON.parse(req.response));
         }
+        if(req.status == 401) {
+            return callback({
+                type: "Unauthorized",
+                trace: new Error("Must authorize to access this resource"),
+                status: req.statusText,
+                responseType: req.responseType,
+                response: req.response
+            });
+        }
         callback({
             trace: new Error("Bad response from server on request"),
             status: req.statusText,

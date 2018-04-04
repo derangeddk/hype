@@ -48,6 +48,9 @@ layout: default
     `;
 
     hype.users.list((error, result) => {
+        if(error && error.type == "Unauthorized") {
+            return location.href = "/login?redirect=" + location.pathname;
+        }
         if(error) {
             return console.error("Failed to load users", error);
         }

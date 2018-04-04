@@ -4,10 +4,9 @@ const subscribeEndpoint = require("./subscribe/endpoint");
 const updateSubscriptionEndpoint = require("./update-subscription/endpoint");
 const listCampaignsEndpoint = require("./list-campaigns/endpoint");
 const listSubscribersEndpoint = require("./list-subscribers/endpoint");
-const ensureDb = require("../ensureDb");
-const authenticationMiddleware = require("../authentication/middleware");
+const ensureDb = require("../../utils/ensureDb");
 
-module.exports = (db) => {
+module.exports = (db, authenticate) => {
     let app = express();
 
     //Ensure campaign db
@@ -17,8 +16,6 @@ module.exports = (db) => {
             process.exit(1);
         }
     });
-
-    let authenticate = authenticationMiddleware(db);
 
     //Setup endpoints
     app.post("/", authenticate, createEndpoint(db));

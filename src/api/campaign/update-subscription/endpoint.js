@@ -1,6 +1,6 @@
 const getCampaign = require("../getCampaign");
 const updateCampaignData = require("../updateCampaignData");
-const timestamp = require("../../timestamp");
+const timestamp = require("../../../utils/timestamp");
 
 module.exports = (db) => (req, res) => {
     let { id, subscriberId } = req.params;

@@ -1,4 +1,4 @@
-const pickKeys = require("../../pickKeys");
+const pickKeys = require("../../../utils/pickKeys");
 const getCampaign = require("../getCampaign");
 
 module.exports = (db) => (req, res) => {

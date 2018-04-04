@@ -1,5 +1,5 @@
 const uuid = require("uuid");
-const timestamp = require("../../timestamp");
+const timestamp = require("../../../utils/timestamp");
 
 module.exports = (db) => (req, res) => {
     let { name } = req.body;

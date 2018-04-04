@@ -31,6 +31,7 @@ Feature: Campaign
         And the subscribers to the "Curling Enthusiasts" campaign are:
         | name  | email             | status  |
         | Niels | niels@deranged.dk | pending |
+        And an email has been sent to niels@deranged.dk
 
     Scenario: Confirm signup for campaign
         Given a campaign "Curling Enthusiasts" exists

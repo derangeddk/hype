@@ -1,0 +1,32 @@
+---
+layout: default
+---
+<div id="unsubscribing-page" class="page">
+    <div class="spinner"></div>
+    Unsubscribing...
+</div>
+<script>
+(function() {
+    let page = document.querySelector("#unsubscribing-page");
+    let campaignMatch = location.search.match(/campaign=([^&]+)/);
+    let subscriberMatch = location.search.match(/subscriber=([^&]+)/);
+    if(!campaignMatch || !subscriberMatch) {
+        return page.innerHTML = `
+            <h1>Missing subscription specification</h1>
+            <p>The campaign and subscriber IDs that specify which subscription to unsubscribe are missing from the URL, so we can't unsubscribe you.</p>
+        `;
+    }
+    hype.campaign.unsubscribe(campaignMatch[1], subscriberMatch[1], (error) => {
+        if(error) {
+            return page.innerHTML = `
+                <h1>Unsubscribing failed</h1>
+                <p>Refresh the page to try again.</p>
+            `;
+        }
+        page.innerHTML = `
+            <h1>Unsubscribed</h1>
+            <p>We have removed the subscription from our records.</p>
+        `;
+    });
+})();
+</script>

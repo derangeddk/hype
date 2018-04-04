@@ -1,5 +1,7 @@
 const express = require("express");
 const dashboardPage = require("./dashboard/page");
+const subscriberConfirm = require("./subscriberActions/confirmPage");
+const subscriberUnsubscribe = require("./subscriberActions/unsubscribePage");
 const campaignsList = require("./campaigns/list");
 const campaignView = require("./campaigns/view");
 const loginPage = require("./login/page");
@@ -13,6 +15,8 @@ module.exports = (db) => {
     let app = express();
 
     app.get("/", dashboardPage());
+    app.get("/confirm", subscriberConfirm());
+    app.get("/unsubscribe", subscriberUnsubscribe());
     app.get("/campaigns", campaignsList());
     app.get("/campaigns/:id", campaignView());
     app.get("/login", loginPage());

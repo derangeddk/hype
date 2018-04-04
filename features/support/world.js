@@ -94,8 +94,9 @@ Before(function(testCase, callback) {
     this.client = makeClient(serverUri, "client");
     this.adminClient = makeClient(serverUri, "admin");
 
-    //set up db
+    //set up dependencies
     let db = new PostgresPool(config.postgres);
+    this.mailerStub = makeMailerStub();
 
     //clear db
     db.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;", (error) => {
@@ -104,7 +105,7 @@ Before(function(testCase, callback) {
         }
 
         //start server
-        let app = hype(db);
+        let app = hype(db, this.mailerStub, { baseUrl: "///hype-integration-test///" });
         this.server = app.listen(port);
 
         //TODO: fix this timeout
@@ -113,6 +114,18 @@ Before(function(testCase, callback) {
         setTimeout(() => this.adminClient.auth("admin", "admin", callback), 1000);
     });
 });
+
+function makeMailerStub() {
+    let emailsSent = [];
+
+    return {
+        send: (template, recipient, callback) => {
+            emailsSent.push({ template, recipient });
+            callback();
+        },
+        emailsSent
+    };
+}
 
 After(function(testCase, callback) {
     this.server.close(callback);

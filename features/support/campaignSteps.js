@@ -268,4 +268,13 @@ When(/^I attempt to list the subscribers to the "([^"]+)" campaign$/, function(c
     });
 });
 
-
+Then(/^an email has been sent to (.+)$/, function(email, callback) {
+    let emailSent = this.mailerStub.emailsSent.some((sentEmail) => sentEmail.recipient.email == email);
+    if(!emailSent) {
+        return callback({
+            trace: new Error("No email found sent to " + email),
+            sentEmails: this.mailerStub.emailsSent
+        });
+    }
+    callback();
+});

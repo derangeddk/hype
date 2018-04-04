@@ -1,0 +1,10 @@
+{
+    "mailgun": {
+        "from": "MAILGUN_FROM_EMAIL",
+        "domain": "MAILGUN_DOMAIN",
+        "apiKey": "MAILGUN_API_KEY"
+    },
+    "hype": {
+        "baseUrl": "BASEURL"
+    }
+}

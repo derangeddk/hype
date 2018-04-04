@@ -4,5 +4,13 @@
         "user": "postgres",
         "password": "postgres",
         "database": "postgres"
+    },
+    "mailgun": {
+        "from": "please-supply-in-env",
+        "domain": "please-supply-in-env",
+        "apiKey": "please-supply-in-env"
+    },
+    "hype": {
+        "baseUrl": "please-supply-in-env"
     }
 }

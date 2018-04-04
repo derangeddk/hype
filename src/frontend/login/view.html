@@ -25,7 +25,8 @@ layout: default
                 return;
             }
             localStorage.setItem("hype-authentication", hype.getAuthToken());
-            location.pathname = "/campaigns";
+            let redirectQuery = location.search.match(/redirect=([^&]+)/);
+            location.href = redirectQuery ? redirectQuery[1] : "/";
         });
     });
 })();

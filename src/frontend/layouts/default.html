@@ -219,6 +219,92 @@
             form#login-form label {
                 display: block;
             }
+            .compose-container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                align-items: stretch;
+                justify-content: stretch;
+                height: 100vh;
+                width: 100%;
+            }
+            .compose-field-list {
+                width: 200px;
+                flex-grow: 0;
+                flex-shrink: 0;
+                box-sizing: border-box;
+                padding: 10px;
+            }
+            .compose-field-list ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                font-size: 0.9em;
+            }
+            .compose-field-list .compose-field-global:after {
+                content: 'GLOBAL';
+                font-size: 0.6em;
+                border: 1px solid #8e44ad;
+                color: #8e44ad;
+                display: inline-block;
+                padding: 0 3px;
+                margin: 0 3px;
+            }
+            .compose-field-list .compose-field-all-have:after {
+                content: 'ALL SUBS';
+                font-size: 0.6em;
+                border: 1px solid #2ecc71;
+                color: #2ecc71;
+                display: inline-block;
+                padding: 0 3px;
+                margin: 0 3px;
+            }
+            .compose-editor {
+                flex-grow: 1;
+                flex-shrink: 0;
+                flex-basis: 100px;
+            }
+            .compose-editor textarea {
+                font-family: Consolas, Monaco, 'Courier New', Courier, monospace;
+                width: 100%;
+                height: 100%;
+                font-size: 0.82em;
+                padding: 8px;
+                resize: none;
+                box-sizing: border-box;
+                border: 1px solid #1B3045;
+            }
+            .compose-preview {
+                flex-grow: 1;
+                flex-shrink: 0;
+                flex-basis: 100px;
+                display: flex;
+                flex-direction: column;
+                justify-content: stretch;
+                align-items: stretch;
+            }
+            .compose-preview .preview {
+                border: 1px solid #1B3045;
+                border-left: none;
+                overflow-y: scroll;
+                background: white;
+                box-sizing: border-box;
+                flex-grow: 1;
+                flex-shrink: 0;
+                flex-basis: 100px;
+            }
+            .compose-preview .send-button {
+                display: block;
+                background: #2ecc71;
+                color: white;
+                font-weight: bold;
+                font-size: 1.2em;
+                height: 75px;
+                flex-grow: 0;
+                flex-shrink: 0;
+                border: none;
+                cursor: pointer;
+            }
         </style>
         <script>
             let authentication = localStorage.getItem("hype-authentication");

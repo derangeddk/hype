@@ -1,0 +1,61 @@
+---
+layout: default
+---
+<!-- left-bar lists available fields (from looking at users; "all-have" and "some-have" -->
+<!-- code view lets you write the mustache HTML (hint at syntax at bottom) -->
+<!-- right pane previews email with first person on list -->
+
+<div class="compose-container">
+    <div class="compose-field-list">
+        <strong>Available fields</strong>
+        <ul>
+            <li class="compose-field compose-field-global">campaign.name</li>
+            <li class="compose-field compose-field-all-have">name</li>
+            <li class="compose-field compose-field-all-have">email</li>
+            <li class="compose-field compose-field-all-have">username</li>
+            <li class="compose-field compose-field-all-have">unsubscribeLink</li>
+        </ul>
+    </div>
+    <div class="compose-editor">
+        <textarea>
+<div style="margin: 10px; padding: 0 10px; border: 5px solid #ccc;">
+    <p>
+        Hi {{ name }},
+    </p>
+    <p>
+        We are writing to say we ate the plums, and they were delicious.
+    </p>
+    <p>
+        Best,<br>
+        The long-fingered plum-eaterss
+    </p>
+</div>
+<div style="font-size: 0.8em; padding: 0 15px;">
+    <a href="{{ unsubscribeLink }}">Unsubscribe from {{ campaign.name }} newsletter</a>
+</div>
+        </textarea>
+    </div>
+    <div class="compose-preview">
+        <div class="preview">
+
+        </div>
+        <button class="send-button">Send email to subscribers</button>
+    </div>
+</div>
+<script src="/assets/emailComposer.js"></script>
+<script>
+    (function() {
+        let preview = document.querySelector(".compose-preview .preview");
+        let editor = document.querySelector(".compose-editor textarea");
+
+        emailComposer(editor, preview, {
+            campaign: { name: "Plum Enthusiasts" },
+            name: "James McAway",
+            email: "james@mcaway.com",
+            username: "jamieaway",
+            unsubscribeLink: "http://hype/unsubscribe?campaign=123&subscriber=456"
+        });
+
+        editor.scrollIntoView(true);
+    })();
+</script>

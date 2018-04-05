@@ -5,16 +5,20 @@ const webpack = require("webpack");
 const buildPath = path.join(__dirname, "_build");
 const page = require("./page")(__dirname);
 const campaignView = require("./campaigns/view");
+const composeView = require("./campaigns/compose");
+const CampaignRepository = require("../api/campaign/repository");
 
-module.exports = (db) => {
+module.exports = (db, hypeConfig) => {
     let app = express();
+
+    let campaignRepository = CampaignRepository(db);
 
     app.get("/", page("dashboard/view.html"));
     app.get("/confirm", page("subscriberActions/confirmView.html"));
     app.get("/unsubscribe", page("subscriberActions/unsubscribeView.html"));
     app.get("/campaigns", page("campaigns/list.html"));
     app.get("/campaigns/:id", campaignView());
-    app.get("/campaigns/:id/compose", page("campaigns/compose.html"));
+    app.get("/campaigns/:id/compose", composeView(campaignRepository, hypeConfig));
     app.get("/login", page("login/view.html"));
     app.get("/users", page("users/view.html"));
 

@@ -5,35 +5,23 @@ layout: default
 <!-- code view lets you write the mustache HTML (hint at syntax at bottom) -->
 <!-- right pane previews email with first person on list -->
 
+<div class="spinner-overlay overlay">
+    <div class="spinner"></div>
+</div>
+<div class="success-overlay overlay">
+    <p>Email sent!</p>
+</div>
 <div class="compose-container">
     <div class="compose-field-list">
         <strong>Available fields</strong>
         <ul>
-            <li class="compose-field compose-field-global">campaign.name</li>
-            <li class="compose-field compose-field-all-have">name</li>
-            <li class="compose-field compose-field-all-have">email</li>
-            <li class="compose-field compose-field-all-have">username</li>
-            <li class="compose-field compose-field-all-have">unsubscribeLink</li>
+            {{ #availableFields }}
+            <li class="compose-field compose-field-{{ fieldAvailability }}">{{ fieldName }}</li>
+            {{ /availableFields }}
         </ul>
     </div>
     <div class="compose-editor">
-        <textarea>
-<div style="margin: 10px; padding: 0 10px; border: 5px solid #ccc;">
-    <p>
-        Hi {{ name }},
-    </p>
-    <p>
-        We are writing to say we ate the plums, and they were delicious.
-    </p>
-    <p>
-        Best,<br>
-        The long-fingered plum-eaterss
-    </p>
-</div>
-<div style="font-size: 0.8em; padding: 0 15px;">
-    <a href="{{ unsubscribeLink }}">Unsubscribe from {{ campaign.name }} newsletter</a>
-</div>
-        </textarea>
+        <textarea>{{ defaultEmailContent }}</textarea>
     </div>
     <div class="compose-preview">
         <div class="preview">
@@ -48,14 +36,36 @@ layout: default
         let preview = document.querySelector(".compose-preview .preview");
         let editor = document.querySelector(".compose-editor textarea");
 
-        emailComposer(editor, preview, {
-            campaign: { name: "Plum Enthusiasts" },
-            name: "James McAway",
-            email: "james@mcaway.com",
-            username: "jamieaway",
-            unsubscribeLink: "http://hype/unsubscribe?campaign=123&subscriber=456"
-        });
+        emailComposer(editor, preview, {{ &previewViewModel }});
 
         editor.scrollIntoView(true);
+
+        document.querySelector(".send-button").addEventListener("click", (e) => {
+            e.preventDefault();
+            showGiantSpinner();
+            hype.email.send("{{ campaignId }}", editor.value, (error) => {
+                if(error) {
+                    return console.error("Failed to send email", error);
+                }
+                showSuccess(() => location.href = "/campaigns/{{ campaignId }}");
+            });
+        });
+
+        let giantSpinner = document.querySelector(".spinner-overlay");
+        let success = document.querySelector(".success-overlay");
+
+        function showGiantSpinner() {
+            giantSpinner.style = `display: flex;`;
+            setTimeout(() => giantSpinner.style = `display: flex; opacity: 1;`, 50);
+        }
+
+        function showSuccess(callback) {
+            giantSpinner.style = `display: flex; opacity: 0;`;
+            success.style = `display: flex;`;
+            setTimeout(() => {
+                success.style = `display: flex; opacity: 1;`;
+                setTimeout(callback, 1000);
+            }, 50);
+        }
     })();
 </script>

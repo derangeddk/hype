@@ -305,6 +305,20 @@
                 border: none;
                 cursor: pointer;
             }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                align-items: center;
+                justify-content: center;
+                font-size: 2em;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
         </style>
         <script>
             let authentication = localStorage.getItem("hype-authentication");

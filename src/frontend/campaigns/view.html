@@ -18,7 +18,7 @@ layout: default
         let campaign = data.campaigns.find((campaign) => campaign.id == "{{ campaignId }}");
         if(!campaign) {
             //TODO: 404 page
-            return console.error("The requested campaign does not exist", error);
+            return console.error("The requested campaign does not exist");
         }
         hype.campaign.listSubscribers("{{ campaignId }}", (error, data) => {
             if(error && error.type == "Unauthorized") {
@@ -45,6 +45,7 @@ layout: default
                 ${campaign.subscribers.filter((s) => s.status == "pending").length} pending |
                 ${campaign.subscribers.filter((s) => s.status == "unsubscribed").length} unsubscribed
             </span>
+            <a class="start-compose-button" href="/campaigns/{{ campaignId }}/compose">Write an email to subscribers</a>
             <form class="add-subscriber-form add-item-form">
                 <label for="name">
                     Name:

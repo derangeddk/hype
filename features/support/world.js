@@ -123,6 +123,10 @@ function makeMailerStub() {
             emailsSent.push({ template, recipient });
             callback();
         },
+        sendBatch: (template, recipients, callback) => {
+            recipients.forEach((recipient) => emailsSent.push({ template, recipient }));
+            callback();
+        },
         emailsSent
     };
 }

@@ -8,10 +8,8 @@ const campaignView = require("./campaigns/view");
 const composeView = require("./campaigns/compose");
 const CampaignRepository = require("../api/campaign/repository");
 
-module.exports = (db, hypeConfig) => {
+module.exports = (campaignRepository, hypeConfig) => {
     let app = express();
-
-    let campaignRepository = CampaignRepository(db);
 
     app.get("/", page("dashboard/view.html"));
     app.get("/confirm", page("subscriberActions/confirmView.html"));

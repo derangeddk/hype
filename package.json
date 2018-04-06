@@ -27,6 +27,7 @@
     "config": "^1.30.0",
     "express": "^4.16.3",
     "front-matter": "^2.3.0",
+    "html-to-text": "^4.0.0",
     "mailgun-mustache-mailer": "^1.0.0",
     "mustache": "^2.3.0",
     "pg": "^7.4.1",

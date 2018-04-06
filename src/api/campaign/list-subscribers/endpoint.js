@@ -1,11 +1,10 @@
 const pickKeys = require("../../../utils/pickKeys");
-const getCampaign = require("../getCampaign");
 
-module.exports = (db) => (req, res) => {
+module.exports = (campaignRepository) => (req, res) => {
     let { id } = req.params;
     let { status } = req.query;
     
-    getCampaign(db, id, (error, campaign) => {
+    campaignRepository.get(id, (error, campaign) => {
         if(error && error.type == "NotFound") {
             return res.status(404).send({ error: "No campaign with that id" });
         }

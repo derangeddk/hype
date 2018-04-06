@@ -1,17 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const campaignApp = require("./campaign/app");
-const Ident = require("../ident/index");
+const emailApp = require("./email/app");
 
-module.exports = (db, mailer, hypeConfig) => {
+module.exports = (ident, campaignRepository, mailer, hypeConfig) => {
     let app = express();
-    let ident = Ident(db);
 
     app.use(bodyParser.json());
     
     app.use("/authenticate", ident.authentication.api);
     app.use("/user", ident.user.api);
-    app.use("/campaign", campaignApp(db, ident.authentication.middleware, mailer, hypeConfig));
+    app.use("/campaign", campaignApp(campaignRepository, ident.authentication.middleware, mailer, hypeConfig));
+    app.use("/email", ident.authentication.middleware, emailApp(campaignRepository, mailer, hypeConfig));
 
     app.use(function notFound(req, res) {
         res.status(404).send({ error: `Endpoint ${req.originalUrl} not found` });

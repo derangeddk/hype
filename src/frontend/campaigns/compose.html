@@ -21,6 +21,9 @@ layout: default
         </ul>
     </div>
     <div class="compose-editor">
+        <label class="subject-container">
+            <input type="text" name="subject" placeholder="Email subject">
+        </label>
         <textarea>{{ defaultEmailContent }}</textarea>
     </div>
     <div class="compose-preview">
@@ -35,6 +38,7 @@ layout: default
     (function() {
         let preview = document.querySelector(".compose-preview .preview");
         let editor = document.querySelector(".compose-editor textarea");
+        let subject = document.querySelector(".compose-editor [name=subject]");
 
         emailComposer(editor, preview, {{ &previewViewModel }});
 
@@ -43,7 +47,7 @@ layout: default
         document.querySelector(".send-button").addEventListener("click", (e) => {
             e.preventDefault();
             showGiantSpinner();
-            hype.email.send("{{ campaignId }}", editor.value, (error) => {
+            hype.email.send("{{ campaignId }}", subject.value, editor.value, (error) => {
                 if(error) {
                     return console.error("Failed to send email", error);
                 }
@@ -64,7 +68,7 @@ layout: default
             success.style = `display: flex;`;
             setTimeout(() => {
                 success.style = `display: flex; opacity: 1;`;
-                setTimeout(callback, 1000);
+                setTimeout(callback, 3500);
             }, 50);
         }
     })();

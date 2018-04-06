@@ -35,6 +35,9 @@ module.exports = (request) => {
             list: (callback) => r("GET", `/campaign`, callback),
             listSubscribers: (campaignId, callback) => r("GET", `/campaign/${campaignId}/subscriber`, callback),
             listConfirmedSubscribers: (campaignId, callback) => r("GET", `/campaign/${campaignId}/subscriber?status=confirmed`, callback)
+        },
+        email: {
+            send: (campaignId, subject, html, callback) => r("POST", `/email/send`, { campaignId, emailContent: html, subject }, callback)
         }
     }
 };

@@ -1,12 +1,10 @@
-const getCampaign = require("../getCampaign");
-const updateCampaignData = require("../updateCampaignData");
 const timestamp = require("../../../utils/timestamp");
 
-module.exports = (db) => (req, res) => {
+module.exports = (campaignRepository) => (req, res) => {
     let { id, subscriberId } = req.params;
     let { status } = req.body;
 
-    getCampaign(db, id, (error, campaign) => {
+    campaignRepository.get(id, (error, campaign) => {
         if(error && error.type == "NotFound") {
             return res.status(404).send({ error: "No such campaign" });
         }
@@ -23,7 +21,7 @@ module.exports = (db) => (req, res) => {
         subscriber.status = status;
         subscriber[`${status}At`] = timestamp();
 
-        updateCampaignData(db, id, campaign, (error) => {
+        campaignRepository.update(id, campaign, (error) => {
             if(error) {
                 console.error("Failed to update campaign", error, id, data);
                 return res.status(500).send({ error: "Failed to update subscription" });

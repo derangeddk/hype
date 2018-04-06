@@ -1,9 +1,7 @@
 const uuid = require("uuid");
-const getCampaign = require("../getCampaign");
-const updateCampaignData = require("../updateCampaignData");
 const timestamp = require("../../../utils/timestamp");
 
-module.exports = (db, mailer, hypeConfig) => (req, res) => {
+module.exports = (campaignRepository, mailer, hypeConfig) => (req, res) => {
     let { id } = req.params;
     let { name, email } = req.body;
 
@@ -14,7 +12,7 @@ module.exports = (db, mailer, hypeConfig) => (req, res) => {
         return res.status(400).send({ error: "Missing or invalid `email` for subscriber" });
     }
 
-    getCampaign(db, id, (error, campaign) => {
+    campaignRepository.get(id, (error, campaign) => {
         if(error && error.type == "NotFound") {
             return res.status(404).send({ error: "No such campaign" });
         }
@@ -25,7 +23,7 @@ module.exports = (db, mailer, hypeConfig) => (req, res) => {
         let subscriber = { id: uuid.v4(), name, email, status: "pending", subscribedAt: timestamp() };
         campaign.subscribers.push(subscriber);
 
-        updateCampaignData(db, id, campaign, (error) => {
+        campaignRepository.update(id, campaign, (error) => {
             if(error) {
                 console.error("Failed to update campaign", error, id, data);
                 return res.status(500).send({ error: "Failed to subscribe" });

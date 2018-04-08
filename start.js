@@ -4,6 +4,8 @@ const PostgresPool = require("pg-pool");
 const MailgunMustacheMailer = require("mailgun-mustache-mailer");
 const config = require("config");
 
+process.once("SIGINT", () => process.exit(0));
+
 const port = 4000;
 
 //set up dependencies

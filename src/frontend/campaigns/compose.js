@@ -11,13 +11,13 @@ module.exports = (campaignRepository, hypeConfig) => (req, res) => {
     campaignRepository.get(id, (error, campaign) => {
         if(error) {
             console.error("Failed to get campaign info for campaign", id, error);
-            return errorPage(500);
+            return res.send(errorPage(500));
         }
 
         let subscribers = campaign.subscribers.filter((subscriber) => subscriber.status == "confirmed");
 
         if(subscribers.length == 0) {
-            return errorPage(400, "There are no subscribers for this list, so you cannot send them email yet.");
+            return res.send(errorPage(400, "There are no subscribers for this list, so you cannot send them email yet."));
         }
 
         //Set up unsubscribe links
@@ -30,7 +30,7 @@ module.exports = (campaignRepository, hypeConfig) => (req, res) => {
             campaign: { name: campaign.name },
             ...subscribers[0]
         };
-        
+
         let subscriberFields = {};
         subscribers.forEach((subscriber) => {
             Object.keys(subscriber).forEach((subscriberField) => {

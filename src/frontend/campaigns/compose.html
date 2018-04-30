@@ -11,6 +11,9 @@ layout: default
 <div class="success-overlay overlay">
     <p>Email sent!</p>
 </div>
+<div class="failure-overlay overlay">
+    <p>Failed to send email. <span class="failure-overlay-error"></span></p>
+</div>
 <div class="compose-container">
     <div class="compose-field-list">
         <strong>Available fields</strong>
@@ -49,7 +52,18 @@ layout: default
             showGiantSpinner();
             hype.email.send("{{ campaignId }}", subject.value, editor.value, (error) => {
                 if(error) {
-                    return console.error("Failed to send email", error);
+                    console.error("Failed to send email", error);
+                    if(error.response) {
+                        let msg;
+                        try {
+                            msg = JSON.parse(error.response).error;
+                        }
+                        catch(e) {
+                            return showFailure("");
+                        }
+                        return showFailure(msg);
+                    }
+                    return showFailure("");
                 }
                 showSuccess(() => location.href = "/campaigns/{{ campaignId }}");
             });
@@ -57,6 +71,8 @@ layout: default
 
         let giantSpinner = document.querySelector(".spinner-overlay");
         let success = document.querySelector(".success-overlay");
+        let failure = document.querySelector(".failure-overlay");
+        let failureMsg = failure.querySelector(".failure-overlay-error");
 
         function showGiantSpinner() {
             giantSpinner.style = `display: flex;`;
@@ -69,6 +85,23 @@ layout: default
             setTimeout(() => {
                 success.style = `display: flex; opacity: 1;`;
                 setTimeout(callback, 3500);
+            }, 50);
+        }
+
+        function showFailure(msg) {
+            console.log("failuremsg", msg);
+            failureMsg.innerText = msg;
+            giantSpinner.style = `display: flex; opacity: 0;`;
+            failure.style = `display: flex;`;
+            setTimeout(() => {
+                failure.style = `display: flex; opacity: 1;`;
+                setTimeout(() => {
+                    failure.style = `display: flex; opacity: 0;`;
+                    setTimeout(() => {
+                        failure.style = ``;
+                        giantSpinner.style = ``;
+                    }, 550);
+                }, 4000);
             }, 50);
         }
     })();

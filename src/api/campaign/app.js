@@ -1,5 +1,6 @@
 const express = require("express");
 const createEndpoint = require("./create/endpoint");
+const updateEndpoint = require("./update/endpoint");
 const subscribeEndpoint = require("./subscribe/endpoint");
 const updateSubscriptionEndpoint = require("./update-subscription/endpoint");
 const listCampaignsEndpoint = require("./list-campaigns/endpoint");
@@ -11,6 +12,7 @@ module.exports = (campaignRepository, authenticate, mailer, hypeConfig) => {
 
     //Setup endpoints
     app.post("/", authenticate, createEndpoint(campaignRepository));
+    app.put("/:id", authenticate, updateEndpoint(campaignRepository));
     app.post("/:id/subscriber", subscribeEndpoint(campaignRepository, mailer, hypeConfig));
     app.put("/:id/subscriber/:subscriberId", updateSubscriptionEndpoint(campaignRepository));
 

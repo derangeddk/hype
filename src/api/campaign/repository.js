@@ -13,9 +13,13 @@ module.exports = (db) => {
     });
 
     return {
-        create: (name, callback) => {
+        create: (name, confirmationUrl, callback) => {
             let id = uuid.v4();
             let data = { name, subscribers: [], createdAt: timestamp() };
+
+            if(confirmationUrl) {
+                data.confirmationUrl = confirmationUrl;
+            }
 
             db.query("INSERT INTO campaigns (id, data) VALUES ($1::uuid, $2::json)", [ id, data ], (error) => {
                 if(error) {

@@ -4,34 +4,17 @@ module.exports = (campaignRepository) => (req, res) => {
     let { id, subscriberId } = req.params;
     let { status } = req.body;
 
-    campaignRepository.get(id, (error, campaign) => {
+    campaignRepository.changeSubscriptionStatus(id, subscriberId, status, (error, subscriber) => {
         if(error && error.type == "NotFound") {
-            return res.status(404).send({ error: "No such campaign" });
+            return res.status(404).send({ error: "No such subscriber" });
         }
-        if(error) {
-            console.error("Failed to get campaign", error, id);
-            return res.status(500).send({ error: "Failed to update subscription" });
-        }
-
-        let subscriber = campaign.subscribers.find((subscriber) => subscriber.id == subscriberId);
-        
-        if(!validStateTransition(subscriber.status, status)) {
+        if(error && error.type == "InvalidTransition") {
             return res.status(400).send({ error: `Invalid state transition ${subscriber.status}-->${status} for subscriber`});
         }
-        subscriber.status = status;
-        subscriber[`${status}At`] = timestamp();
-
-        campaignRepository.update(id, campaign, (error) => {
-            if(error) {
-                console.error("Failed to update campaign", error, id, data);
-                return res.status(500).send({ error: "Failed to update subscription" });
-            }
-
-            res.send({ subscriber });
-        });
+        if(error) {
+            console.error("Failed to change subscription status", error, id, subscriberId);
+            return res.status(500).send({ error: "Failed to update subscription" });
+        }
+        res.send({ subscriber });
     });
 };
-
-function validStateTransition(from, to) {
-    return (from == "pending" && to == "confirmed") || (from != "unsubscribed" && to == "unsubscribed");
-}

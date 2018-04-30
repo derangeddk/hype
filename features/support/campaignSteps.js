@@ -5,12 +5,16 @@ When(/^I create a campaign "([^"]+)"$/, function(campaignName, callback) {
     this.client.campaign.create(campaignName, callback);
 });
 
+When(/^I create a campaign "([^"]+)" with confirmation URL "([^"]+)"$/, function(campaignName, confirmationUrl, callback) {
+    this.client.campaign.create(campaignName, confirmationUrl, callback);
+});
+
 Then(/^I have ([1-9][0-9]*) campaigns?, including the following:$/, function(numCampaigns, table, callback) {
     this.client.campaign.list((error, data) => {
         if(error) {
             return callback(error);
         }
-        
+
         if(data.campaigns.length !== parseInt(numCampaigns)) {
             return callback({
                 error: new Error(`Expected ${numCampaigns} campaigns, but found ${data.campaigns.length}.`),
@@ -66,7 +70,7 @@ When(/^I sign up for the "([^"]+)" campaign with the following information:$/, f
         }
 
         let { name, email } = table.hashes()[0];
-        
+
         //Sign up for campaign
         this.client.campaign.subscribe(campaign.id, name, email, callback);
     });
@@ -107,7 +111,7 @@ Then(/^the subscribers to the "([^"]+)" campaign are:$/, function(campaignName, 
             let expectedSubscribers = table.hashes();
             let actualSubscribers = data.subscribers;
             let subscribersNotFound = findElementsNotFound(expectedSubscribers, actualSubscribers);
-            
+
             if(subscribersNotFound.length) {
                 return callback({
                     trace: new Error("Some subscribers not found in list"),

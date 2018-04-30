@@ -5,10 +5,10 @@ Feature: Campaign
 
     Scenario: Create campaign
         Given I authenticate as the user "admin" with password "admin"
-        When I create a campaign "Curling Enthusiasts"
+        When I create a campaign "Curling Enthusiasts" with confirmation URL "http://example.website"
         Then I have 1 campaign, including the following:
-        | name                | subscribers |
-        | Curling Enthusiasts | 0           |
+        | name                | subscribers | confirmationUrl        |
+        | Curling Enthusiasts | 0           | http://example.website |
 
     Scenario: List campaigns
         Given I authenticate as the user "admin" with password "admin"

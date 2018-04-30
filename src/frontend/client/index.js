@@ -28,7 +28,14 @@ module.exports = (request) => {
             delete: (username, callback) => r("DELETE", `/user/${username}`, callback)
         },
         campaign: {
-            create: (name, callback) => r("POST", "/campaign", { name }, callback),
+            create: (name, confirmationUrl, callback) => {
+                if(!callback) {
+                    callback = confirmationUrl;
+                    return r("POST", "/campaign", { name }, callback);
+                }
+                return r("POST", "/campaign", { name, confirmationUrl }, callback)
+            },
+            update: (campaignId, dataToUpdate, callback) => r("PUT", `/campaign/${campaignId}`, dataToUpdate, callback),
             subscribe: (campaignId, name, email, callback) => r("POST", `/campaign/${campaignId}/subscriber`, { name, email }, callback),
             confirmSubscription: (campaignId, subscriberId, callback) => r("PUT", `/campaign/${campaignId}/subscriber/${subscriberId}`, { status: "confirmed" }, callback),
             unsubscribe: (campaignId, subscriberId, callback) => r("PUT", `/campaign/${campaignId}/subscriber/${subscriberId}`, { status: "unsubscribed" }, callback),

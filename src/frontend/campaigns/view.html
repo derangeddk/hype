@@ -45,6 +45,13 @@ layout: default
                 ${campaign.subscribers.filter((s) => s.status == "pending").length} pending |
                 ${campaign.subscribers.filter((s) => s.status == "unsubscribed").length} unsubscribed
             </span>
+            <form class="confirmation-url-form">
+                <label for="confirmationUrl">
+                    Confirmation URL:
+                    <input type="text" name="confirmationUrl" placeholder="http://" value="${campaign.confirmationUrl || ""}">
+                </label>
+                <button type="submit">Update</button>
+            </form>
             <a class="start-compose-button" href="/campaigns/{{ campaignId }}/compose">Write an email to subscribers</a>
             <form class="add-subscriber-form add-item-form">
                 <label for="name">
@@ -83,6 +90,18 @@ layout: default
                     </td>
             `;
         }
+
+        //enable confirmation url form
+        let confirmationUrlForm = campaignView.querySelector("form.confirmation-url-form");
+        confirmationUrlForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            hype.campaign.update("{{ campaignId }}", { confirmationUrl: confirmationUrlForm.confirmationUrl.value }, (error) => {
+                if(error) {
+                    console.error("Failed to update", error);
+                    confirmationUrlForm.confirmationUrl.value = campaign.confirmationUrl || "";
+                }
+            });
+        });
 
         let subscriberListTbody = campaignView.querySelector(".subscriber-list tbody");
 

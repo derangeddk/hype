@@ -1,4 +1,10 @@
 {
+    "postgres": {
+        "host": "POSTGRES_HOST",
+        "user": "POSTGRES_USER",
+        "password": "POSTGRES_PASSWORD",
+        "database": "POSTGRESS_DATABASE"
+    },
     "mailgun": {
         "from": "MAILGUN_FROM_EMAIL",
         "domain": "MAILGUN_DOMAIN",

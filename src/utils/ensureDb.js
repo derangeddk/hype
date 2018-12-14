@@ -1,4 +1,3 @@
-//TODO: onCreate option
 module.exports = (db, descriptor, hooks, callback) => {
     if(!callback) {
         callback = hooks;

@@ -111,3 +111,13 @@ Feature: Campaign
         And the subscription for anders@deranged.dk to the "Curling Enthusiasts" campaign is confirmed
         When I attempt to list the subscribers to the "Curling Enthusiasts" campaign
         Then I am told that I must be authenticated to perform that action
+
+    Scenario: Set up mailgun config for specific campaign
+        Given I authenticate as the user "admin" with password "admin"
+        And a campaign "Curling Enthusiasts" exists
+        When I set the following custom mailgun config for the "Curling Enthusiasts" campaign:
+        | from   | domain | apiKey  |
+        | x@y.z  | y.z    | somekey |
+        Then the campaign "Curling Enthusiasts" has the following custom mailgun config:
+        | from   | domain | apiKey  |
+        | x@y.z  | y.z    | somekey |

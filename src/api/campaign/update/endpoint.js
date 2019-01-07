@@ -13,18 +13,20 @@ module.exports = (repository) => (req, res) => {
         if(typeof mailgunConfig !== "object") {
             return res.status(400).send({ error: "Mailgun config must be an object containing fields `from`, `domain` and `apiKey`."});
         }
-        if(!mailgunConfig.from || !mailgunConfig.domain || !mailgunConfig.apiKey) {
-            return res.status(400).send({ error: "Mailgun config must contain fields `from`, `domain` and `apiKey`."});
-        }
-        if(typeof mailgunConfig.from !== "string" || typeof mailgunConfig.domain !== "string" || typeof mailgunConfig.apiKey !== "string") {
-            return res.status(400).send({
-                error: "Mailgun config values must be strings, but at least one was not.",
-                types: {
-                    from: typeof mailgunConfig.from,
-                    domain: typeof mailgunConfig.domain,
-                    apiKey: typeof mailgunConfig.apiKey
-                }
-            });
+        if(Object.keys(mailgunConfig) !== 0) {
+            if(!mailgunConfig.from || !mailgunConfig.domain || !mailgunConfig.apiKey) {
+                return res.status(400).send({ error: "Mailgun config must contain fields `from`, `domain` and `apiKey`."});
+            }
+            if(typeof mailgunConfig.from !== "string" || typeof mailgunConfig.domain !== "string" || typeof mailgunConfig.apiKey !== "string") {
+                return res.status(400).send({
+                    error: "Mailgun config values must be strings, but at least one was not.",
+                    types: {
+                        from: typeof mailgunConfig.from,
+                        domain: typeof mailgunConfig.domain,
+                        apiKey: typeof mailgunConfig.apiKey
+                    }
+                });
+            }
         }
     }
 
@@ -41,11 +43,16 @@ module.exports = (repository) => (req, res) => {
             campaign.confirmationUrl = confirmationUrl;
         }
         if(mailgunConfig) {
-            campaign.mailgunConfig = {
-                from: mailgunConfig.from,
-                domain: mailgunConfig.domain,
-                apiKey: mailgunConfig.apiKey
-            };
+            if(Object.keys(mailgunConfig) === 0) {
+                delete campaign.mailgunConfig;
+            }
+            else {
+                campaign.mailgunConfig = {
+                    from: mailgunConfig.from,
+                    domain: mailgunConfig.domain,
+                    apiKey: mailgunConfig.apiKey
+                };
+            }
         }
 
         repository.update(id, campaign, (error) => {

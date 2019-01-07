@@ -58,3 +58,27 @@ When(/^I attempt to send an email to the "([^"]+)" campaign with the following c
         });
     });
 });
+
+Then(/^an email has been sent to ([^\s]+) with the following mailgun config:$/, function(email, table, callback) {
+    let mailgunConfig = table.hashes()[0];
+    let emailSent = this.mailerStub.emailsSent.find((sentEmail) => {
+        return sentEmail.recipient.email == email && configsEqual(sentEmail.mailgunConfig, mailgunConfig);
+    });
+
+    if(!emailSent) {
+        return callback({
+            trace: new Error("No email found sent to " + email + " with correct mailgun config"),
+            sentEmails: this.mailerStub.emailsSent.map((email) => JSON.stringify(email)),
+            mailgunConfig
+        });
+    }
+
+    callback();
+});
+
+function configsEqual(a, b) {
+    if(!a || !b) {
+        return false;
+    }
+    return a.from == b.from && a.domain == b.domain && a.apiKey && b.apiKey;
+}

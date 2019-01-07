@@ -1,7 +1,7 @@
 #!node
 const hype = require("./src/app");
 const PostgresPool = require("pg-pool");
-const MailgunMustacheMailer = require("mailgun-mustache-mailer");
+const mailerWrapper = require("./mailerWrapper");
 const config = require("config");
 
 process.once("SIGINT", () => process.exit(0));
@@ -10,7 +10,7 @@ const port = 4000;
 
 //set up dependencies
 const db = new PostgresPool(config.postgres);
-const mailer = new MailgunMustacheMailer(config.mailgun, { info: console.log });
+const mailer = mailerWrapper(config.mailgun);
 
 //start server
 const app = hype(db, mailer, config.hype);

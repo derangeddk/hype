@@ -32,3 +32,25 @@ Feature: Send email
         | subject | html                                                             |
         | Hi!     | <p>Welcome to the Curling Enthusiast newsletter, {{ name }}.</p> |
         Then I am told that I must be authenticated to perform that action
+
+    Scenario: Send email for campaign with custom mailgun config
+        Given I authenticate as the user "admin" with password "admin"
+        And a campaign "Curling Enthusiasts" exists
+        And the following users have signed up for the "Curling Enthusiasts" campaign:
+        | name    | email                |
+        | Niels   | niels@deranged.dk    |
+        | Anders  | anders@deranged.dk   |
+        And the subscription for niels@deranged.dk to the "Curling Enthusiasts" campaign is confirmed
+        And the subscription for anders@deranged.dk to the "Curling Enthusiasts" campaign is confirmed
+        And the campaign "Curling Enthusiasts" has custom mailgun config:
+        | from   | domain | apiKey  |
+        | x@y.z  | y.z    | somekey |
+        When I attempt to send an email to the "Curling Enthusiasts" campaign with the following content:
+        | subject | html                                                             |
+        | Hi!     | <p>Welcome to the Curling Enthusiast newsletter, {{ name }}.</p> |
+        Then an email has been sent to niels@deranged.dk with the following mailgun config:
+        | from   | domain | apiKey  |
+        | x@y.z  | y.z    | somekey |
+        And an email has been sent to anders@deranged.dk with the following mailgun config:
+        | from   | domain | apiKey  |
+        | x@y.z  | y.z    | somekey |

@@ -96,7 +96,7 @@ Before(function(testCase, callback) {
 
     //set up dependencies
     let db = new PostgresPool(config.postgres);
-    this.mailerStub = makeMailerStub();
+    this.mailerStub = makeMailerStub.call(this);
 
     //clear db
     db.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;", (error) => {
@@ -119,16 +119,30 @@ function makeMailerStub() {
     let emailsSent = [];
 
     return {
-        send: (template, recipient, callback) => {
-            emailsSent.push({ template, recipient });
-            callback();
-        },
-        sendBatch: (template, recipients, callback) => {
-            recipients.forEach((recipient) => emailsSent.push({ template, recipient }));
-            callback();
-        },
-        emailsSent
+        send: mockSend,
+        sendBatch: mockSendBatch,
+        emailsSent,
+        withConfig: mockWithConfig
     };
+
+    function mockSend(template, recipient, callback) {
+        emailsSent.push({ template, recipient, mailgunConfig: this.mailgunConfig });
+        callback();
+    }
+
+    function mockSendBatch(template, recipients, callback) {
+        recipients.forEach((recipient) => emailsSent.push({ template, recipient, mailgunConfig: this.mailgunConfig }));
+        callback();
+    }
+
+    function mockWithConfig(mailgunConfig) {
+        return {
+            send: mockSend.bind({ mailgunConfig }),
+            sendBatch: mockSendBatch.bind({ mailgunConfig }),
+            emailsSent,
+            withConfig: mockWithConfig
+        }
+    }
 }
 
 After(function(testCase, callback) {

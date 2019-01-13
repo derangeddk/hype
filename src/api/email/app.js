@@ -26,7 +26,7 @@ module.exports = (campaignRepository, mailer, hypeConfig) => {
                 return res.status(500).send({ error: "Failed to send email" });
             }
 
-            // Generate additional field
+            // Get recipients from campaign
             let subscribers = campaign.subscribers
                                 .filter((subscriber) => subscriber.status == "confirmed")
                                 .map((subscriber) => {
@@ -34,14 +34,15 @@ module.exports = (campaignRepository, mailer, hypeConfig) => {
                                     return subscriber;
                                 });
 
-            // Get recipients by campaign
-            mailer.sendBatch({
+            let thisMailer = campaign.mailgunConfig ? mailer.withConfig(campaign.mailgunConfig) : mailer;
+
+            thisMailer.sendBatch({
                 subject,
                 text: htmlToText.fromString(emailContent, { wordwrap: 120 }),
                 html: emailContent
-            }, subscribers, (error) => {
-                if(error) {
-                    console.error("Failed to send emails with mailer", error);
+            }, subscribers, (error, id) => {
+                if(error || !id) {
+                    console.error("Failed to send emails with mailer", { customMailer: !!campaign.mailgunConfig }, error);
                     return res.status(500).send({ error: "Failed to send email" });
                 }
                 return res.send({});

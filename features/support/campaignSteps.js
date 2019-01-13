@@ -271,3 +271,62 @@ When(/^I attempt to list the subscribers to the "([^"]+)" campaign$/, function(c
         });
     });
 });
+
+When(/^I set the following custom mailgun config for the "([^"]+)" campaign:$/, function(campaignName, table, callback) {
+    setMailgunConfigByCampaignName.call(this, campaignName, table.hashes()[0], callback);
+});
+
+function setMailgunConfigByCampaignName(campaignName, mailgunConfig, callback) {
+    this.findCampaignByName(campaignName, (error, campaign) => {
+        if(error) {
+            return callback(error);
+        }
+        this.client.campaign.setMailgunConfig(campaign.id, mailgunConfig, (error) => {
+            if(error) {
+                return callback(error);
+            }
+            callback();
+        });
+    });
+}
+
+Given(/^the campaign "([^"]+)" has custom mailgun config:$/, function(campaignName, table, callback) {
+    setMailgunConfigByCampaignName.call(this, campaignName, table.hashes()[0], callback);
+});
+
+Then(/^the campaign "([^"]+)" has the following custom mailgun config:$/, function(campaignName, table, callback) {
+    let mailgunConfig = table.hashes()[0];
+
+    this.client.campaign.list((error, data) => {
+        if(error) {
+            return callback(error);
+        }
+
+        let campaign = data.campaigns.find((campaign) => campaign.name == campaignName);
+        if(!campaign) {
+            return callback({
+                trace: new Error("No such campaign"),
+                campaignName
+            });
+        }
+
+        if(!configsEqual(campaign.mailgunConfig, mailgunConfig)) {
+            return callback({
+                trace: new Error("Mailgun configs do not match"),
+                campaignName,
+                expected: mailgunConfig,
+                found: campaign.mailgunConfig,
+                campaign
+            });
+        }
+
+        callback();
+    });
+});
+
+function configsEqual(a, b) {
+    if(!a || !b) {
+        return false;
+    }
+    return a.from == b.from && a.domain == b.domain && a.apiKey && b.apiKey;
+}

@@ -45,21 +45,14 @@ layout: default
                 ${campaign.subscribers.filter((s) => s.status == "pending").length} pending |
                 ${campaign.subscribers.filter((s) => s.status == "unsubscribed").length} unsubscribed
             </span>
-            <form class="confirmation-url-form">
-                <label for="confirmationUrl">
-                    Confirmation URL:
-                    <input type="text" name="confirmationUrl" placeholder="http://" value="${campaign.confirmationUrl || ""}">
-                </label>
-                <button type="submit">Update</button>
-            </form>
             <a class="start-compose-button" href="/campaigns/{{ campaignId }}/compose">Write an email to subscribers</a>
             <form class="add-subscriber-form add-item-form">
-                <label for="name">
-                    Name:
+                <label>
+                    <span>Name:</span>
                     <input type="text" name="name">
                 </label>
-                <label for="email">
-                    Email:
+                <label>
+                    <span>Email:</span>
                     <input type="text" name="email">
                 </label>
                 <button type="submit">Add subscriber</button>
@@ -75,6 +68,30 @@ layout: default
                 ${campaign.subscribers.map((subscriber) => `<tr data-subscriber-id="${subscriber.id}">${makeSubscriberRow(subscriber)}</tr>`).join("")}
                 </tbody>
             </table>
+            <form class="confirmation-url-form config-form">
+                <h2>Confirmation url</h2>
+                <label>
+                    <span>Confirmation URL:</span>
+                    <input type="text" name="confirmationUrl" placeholder="http://" value="${campaign.confirmationUrl || ""}">
+                </label>
+                <button type="submit">Update confirmation URL</button>
+            </form>
+            <form class="mailgun-config-form config-form">
+                <h2>Mailgun configuration</h2>
+                <label>
+                    <span>Mailgun 'from':</span>
+                    <input type="text" name="mailgunFrom" placeholder="email@domain.com" value="${campaign.mailgunConfig ? campaign.mailgunConfig.from : ""}">
+                </label><br>
+                <label>
+                    <span>Mailgun 'domain':</span>
+                    <input type="text" name="mailgunDomain" placeholder="domain.com" value="${campaign.mailgunConfig ? campaign.mailgunConfig.domain : ""}">
+                </label><br>
+                <label>
+                    <span>Mailgun 'apiKey':</span>
+                    <input type="text" name="mailgunApiKey" placeholder="key-21389y1fklhs891" value="${campaign.mailgunConfig ? campaign.mailgunConfig.apiKey : ""}">
+                </label><br>
+                <button type="submit">Update mailgun config</button>
+            </form>
         `;
 
         function makeSubscriberRow(subscriber) {
@@ -99,6 +116,36 @@ layout: default
                 if(error) {
                     console.error("Failed to update", error);
                     confirmationUrlForm.confirmationUrl.value = campaign.confirmationUrl || "";
+                }
+            });
+        });
+
+        //enable mailgun config form
+        let mailgunConfigForm = campaignView.querySelector("form.mailgun-config-form");
+        mailgunConfigForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            let mailgunConfig = {
+                from: mailgunConfigForm.mailgunFrom.value,
+                domain: mailgunConfigForm.mailgunDomain.value,
+                apiKey: mailgunConfigForm.mailgunApiKey.value
+            };
+
+            if(!mailgunConfig.from && !mailgunConfig.domain && !mailgunConfig.apiKey) {
+                mailgunConfig = {};
+            }
+
+            hype.campaign.update("{{ campaignId }}", { mailgunConfig }, (error) => {
+                if(error) {
+                    console.error("Failed to update", error);
+                    if(campaign.mailgunConfig) {
+                        mailgunConfigForm.mailgunFrom.value = campaign.mailgunConfig.from;
+                        mailgunConfigForm.mailgunDomain.value = campaign.mailgunConfig.domain;
+                        mailgunConfigForm.mailgunApiKey.value = campaign.mailgunConfig.apiKey;
+                    }
+                    else {
+                        mailgunConfigForm.mailgunFrom.value = mailgunConfigForm.mailgunDomain.value = mailgunConfigForm.mailgunApiKey = "";
+                    }
                 }
             });
         });

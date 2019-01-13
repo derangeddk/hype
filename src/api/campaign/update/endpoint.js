@@ -1,12 +1,33 @@
 module.exports = (repository) => (req, res) => {
     let { id } = req.params;
-    let { confirmationUrl } = req.body;
+    let { confirmationUrl, mailgunConfig } = req.body;
 
-    if(!confirmationUrl) {
+    if(!confirmationUrl && !mailgunConfig) {
         return res.status(400).send({ error: "Nothing to update." });
     }
-    if(!confirmationUrl.match(/^https?:\/\/.+$/)) {
+    if(confirmationUrl && !confirmationUrl.match(/^https?:\/\/.+$/)) {
         return res.status(400).send({ error: "Invalid `confirmationUrl` provided. Must be an URL." });
+    }
+
+    if(mailgunConfig) {
+        if(typeof mailgunConfig !== "object") {
+            return res.status(400).send({ error: "Mailgun config must be an object containing fields `from`, `domain` and `apiKey`; or an empty object to unset the configuration."});
+        }
+        if(Object.keys(mailgunConfig) !== 0) {
+            if(!mailgunConfig.from || !mailgunConfig.domain || !mailgunConfig.apiKey) {
+                return res.status(400).send({ error: "Mailgun config must contain fields `from`, `domain` and `apiKey`."});
+            }
+            if(typeof mailgunConfig.from !== "string" || typeof mailgunConfig.domain !== "string" || typeof mailgunConfig.apiKey !== "string") {
+                return res.status(400).send({
+                    error: "Mailgun config values must be strings, but at least one was not.",
+                    types: {
+                        from: typeof mailgunConfig.from,
+                        domain: typeof mailgunConfig.domain,
+                        apiKey: typeof mailgunConfig.apiKey
+                    }
+                });
+            }
+        }
     }
 
     repository.get(id, (error, campaign) => {
@@ -17,7 +38,22 @@ module.exports = (repository) => (req, res) => {
             console.error("Failed to get campaign data", error);
             return res.status(500).send({ error: "Failed to update campaign" });
         }
-        campaign.confirmationUrl = confirmationUrl;
+
+        if(confirmationUrl) {
+            campaign.confirmationUrl = confirmationUrl;
+        }
+        if(mailgunConfig) {
+            if(Object.keys(mailgunConfig) === 0) {
+                delete campaign.mailgunConfig;
+            }
+            else {
+                campaign.mailgunConfig = {
+                    from: mailgunConfig.from,
+                    domain: mailgunConfig.domain,
+                    apiKey: mailgunConfig.apiKey
+                };
+            }
+        }
 
         repository.update(id, campaign, (error) => {
             if(error && error.type == "NotFound") {

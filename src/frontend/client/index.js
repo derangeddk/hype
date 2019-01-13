@@ -41,7 +41,8 @@ module.exports = (request) => {
             unsubscribe: (campaignId, subscriberId, callback) => r("PUT", `/campaign/${campaignId}/subscriber/${subscriberId}`, { status: "unsubscribed" }, callback),
             list: (callback) => r("GET", `/campaign`, callback),
             listSubscribers: (campaignId, callback) => r("GET", `/campaign/${campaignId}/subscriber`, callback),
-            listConfirmedSubscribers: (campaignId, callback) => r("GET", `/campaign/${campaignId}/subscriber?status=confirmed`, callback)
+            listConfirmedSubscribers: (campaignId, callback) => r("GET", `/campaign/${campaignId}/subscriber?status=confirmed`, callback),
+            setMailgunConfig: (campaignId, mailgunConfig, callback) => r("PUT", `/campaign/${campaignId}`, { mailgunConfig }, callback)
         },
         email: {
             send: (campaignId, subject, html, callback) => r("POST", `/email/send`, { campaignId, emailContent: html, subject }, callback)

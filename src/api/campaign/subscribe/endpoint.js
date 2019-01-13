@@ -29,9 +29,8 @@ module.exports = (campaignRepository, mailer, hypeConfig) => (req, res) => {
                 return res.status(500).send({ error: "Failed to subscribe" });
             }
 
-            sendSignedUpMail(mailer, hypeConfig, subscriber, { id, ...campaign }, (error) => {
-                if(error) {
-                    console.error("Failed to send signup confirmation email", error, { subscriber, campaign });
+            sendSignedUpMail(mailer, hypeConfig, subscriber, { id, ...campaign }, (error, id) => {
+                if(error || !id) {
                     return res.status(500).send({ error: "Failed to subscribe" });
                 }
                 res.send({ subscriber });
@@ -84,5 +83,8 @@ function sendSignedUpMail(mailer, hypeConfig, subscriber, campaign, callback) {
             ${campaign.name} team
         `
     };
-    mailer.send(template, recipient, callback);
+
+    let thisMailer = campaign.mailgunConfig ? mailer.withConfig(campaign.mailgunConfig) : mailer;
+
+    thisMailer.send(template, recipient, callback);
 }

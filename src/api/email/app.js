@@ -34,16 +34,14 @@ module.exports = (campaignRepository, mailer, hypeConfig) => {
                                     return subscriber;
                                 });
 
-            if(campaign.mailgunConfig) {
-                mailer = mailer.withConfig(campaign.mailgunConfig);
-            }
+            let thisMailer = campaign.mailgunConfig ? mailer.withConfig(campaign.mailgunConfig) : mailer;
 
-            mailer.sendBatch({
+            thisMailer.sendBatch({
                 subject,
                 text: htmlToText.fromString(emailContent, { wordwrap: 120 }),
                 html: emailContent
-            }, subscribers, (error) => {
-                if(error) {
+            }, subscribers, (error, id) => {
+                if(error || !id) {
                     console.error("Failed to send emails with mailer", { customMailer: !!campaign.mailgunConfig }, error);
                     return res.status(500).send({ error: "Failed to send email" });
                 }

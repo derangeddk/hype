@@ -3,5 +3,5 @@ module.exports = (code, message) => {
         message = "";
     }
     //TODO
-    return "error " + code;
-}
+    return `error ${code}: ${message}`;
+};

@@ -4,8 +4,8 @@ module.exports = function MailerWrapper(config) {
     let mailer = new MailgunMustacheMailer(config, { info: console.log.bind(console) });
 
     return {
-        send: mailer.send.bind(mailer),
-        sendBatch: mailer.sendBatch.bind(mailer),
+        send: (template, recipient, callback) => mailer.send(template, recipient, callback),
+        sendBatch: (template, recipients, callback) => mailer.sendBatch(template, recipients, callback),
         withConfig: (newConfig) => {
             return MailerWrapper({ ...config, ...newConfig });
         }

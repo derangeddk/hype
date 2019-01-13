@@ -45,30 +45,6 @@ layout: default
                 ${campaign.subscribers.filter((s) => s.status == "pending").length} pending |
                 ${campaign.subscribers.filter((s) => s.status == "unsubscribed").length} unsubscribed
             </span>
-            <form class="confirmation-url-form config-form">
-                <h2>Confirmation url</h2>
-                <label>
-                    <span>Confirmation URL:</span>
-                    <input type="text" name="confirmationUrl" placeholder="http://" value="${campaign.confirmationUrl || ""}">
-                </label>
-                <button type="submit">Update confirmation URL</button>
-            </form>
-            <form class="mailgun-config-form config-form">
-                <h2>Mailgun configuration</h2>
-                <label>
-                    <span>Mailgun 'from':</span>
-                    <input type="text" name="mailgunFrom" placeholder="email@domain.com" value="${campaign.mailgunConfig ? campaign.mailgunConfig.from : ""}">
-                </label><br>
-                <label>
-                    <span>Mailgun 'domain':</span>
-                    <input type="text" name="mailgunDomain" placeholder="domain.com" value="${campaign.mailgunConfig ? campaign.mailgunConfig.from : ""}">
-                </label><br>
-                <label>
-                    <span>Mailgun 'apiKey':</span>
-                    <input type="text" name="mailgunApiKey" placeholder="key-21389y1fklhs891" value="${campaign.mailgunConfig ? campaign.mailgunConfig.apiKey : ""}">
-                </label><br>
-                <button type="submit">Update mailgun config</button>
-            </form>
             <a class="start-compose-button" href="/campaigns/{{ campaignId }}/compose">Write an email to subscribers</a>
             <form class="add-subscriber-form add-item-form">
                 <label>
@@ -92,6 +68,30 @@ layout: default
                 ${campaign.subscribers.map((subscriber) => `<tr data-subscriber-id="${subscriber.id}">${makeSubscriberRow(subscriber)}</tr>`).join("")}
                 </tbody>
             </table>
+            <form class="confirmation-url-form config-form">
+                <h2>Confirmation url</h2>
+                <label>
+                    <span>Confirmation URL:</span>
+                    <input type="text" name="confirmationUrl" placeholder="http://" value="${campaign.confirmationUrl || ""}">
+                </label>
+                <button type="submit">Update confirmation URL</button>
+            </form>
+            <form class="mailgun-config-form config-form">
+                <h2>Mailgun configuration</h2>
+                <label>
+                    <span>Mailgun 'from':</span>
+                    <input type="text" name="mailgunFrom" placeholder="email@domain.com" value="${campaign.mailgunConfig ? campaign.mailgunConfig.from : ""}">
+                </label><br>
+                <label>
+                    <span>Mailgun 'domain':</span>
+                    <input type="text" name="mailgunDomain" placeholder="domain.com" value="${campaign.mailgunConfig ? campaign.mailgunConfig.domain : ""}">
+                </label><br>
+                <label>
+                    <span>Mailgun 'apiKey':</span>
+                    <input type="text" name="mailgunApiKey" placeholder="key-21389y1fklhs891" value="${campaign.mailgunConfig ? campaign.mailgunConfig.apiKey : ""}">
+                </label><br>
+                <button type="submit">Update mailgun config</button>
+            </form>
         `;
 
         function makeSubscriberRow(subscriber) {

@@ -11,7 +11,7 @@ module.exports = (repository) => (req, res) => {
 
     if(mailgunConfig) {
         if(typeof mailgunConfig !== "object") {
-            return res.status(400).send({ error: "Mailgun config must be an object containing fields `from`, `domain` and `apiKey`."});
+            return res.status(400).send({ error: "Mailgun config must be an object containing fields `from`, `domain` and `apiKey`; or an empty object to unset the configuration."});
         }
         if(Object.keys(mailgunConfig) !== 0) {
             if(!mailgunConfig.from || !mailgunConfig.domain || !mailgunConfig.apiKey) {

@@ -337,6 +337,42 @@
                 opacity: 0;
                 transition: opacity 0.5s;
             }
+            .config-form {
+                display: flex;
+                flex-direction: column;
+                padding: 10px;
+                background: rgb(240, 240, 240);
+                margin: 2px 0;
+            }
+            .config-form h2 {
+                font-size: 1em;
+                margin: 0;
+                margin-bottom: 4px;
+            }
+            .config-form label {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 4px;
+            }
+            .config-form label > span {
+                width: 125px;
+                font-size: 0.9em;
+                flex-grow: 0;
+                margin-right: 10px;
+            }
+            .config-form label input {
+                flex-grow: 1;
+                flex-shrink: 1;
+                font-family: inherit;
+                font-size: inherit;
+            }
+            .config-form button {
+                border: none;
+                padding: 6px;
+                cursor: pointer;
+                background: #a29bfe;
+            }
         </style>
         <script>
             let authentication = localStorage.getItem("hype-authentication");

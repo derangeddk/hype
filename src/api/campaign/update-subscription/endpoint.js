@@ -9,7 +9,7 @@ module.exports = (campaignRepository) => (req, res) => {
             return res.status(404).send({ error: "No such subscriber" });
         }
         if(error && error.type == "InvalidTransition") {
-            return res.status(400).send({ error: `Invalid state transition ${subscriber.status}-->${status} for subscriber`});
+            return res.status(400).send({ error: `Invalid state transition -->${status} for subscriber`});
         }
         if(error) {
             console.error("Failed to change subscription status", error, id, subscriberId);
